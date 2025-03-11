@@ -6,6 +6,7 @@ df <- read.csv("./data_cleaned/cleaned_dataframe.csv",stringsAsFactors = TRUE)
 
 library(lmerTest)
 library(tidyverse)
+library(car)
 
 # First check histograms of each variable to view distribution
 
@@ -35,10 +36,20 @@ m1 <- glm(richness_non_native ~ distance_m + Traffic, family = poisson, data = d
 m2 <- glm(richness_non_native ~ Traffic + distance_m, family = poisson, data = df)
 
 summary(m1)
-anova(m1)
+Anova(m1)
 
 summary(m2)
-anova(m2)      #no difference in the order of variables. m1=m2
+Anova(m2)      #no difference in the order of variables. m1=m2
+
+#Analysis of Deviance Table (Type II tests)
+
+# Response: richness_non_native
+# LR Chisq Df Pr(>Chisq)    
+# Traffic     15.4461  1  8.489e-05 ***
+  # distance_m   4.1736  1    0.04106 *  
+  # ---
+  # Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
 
 # Call:
 # glm(formula = richness_non_native ~ distance_m + Traffic, family = poisson, 
