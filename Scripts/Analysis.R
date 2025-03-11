@@ -80,4 +80,4 @@ predictions <- ggpredict(m1, terms = c("distance_m","Traffic"))
 
 # This is with ribbon. Need to make it prettier.
 
-ggplot(predictions,aes(x=x,y=predicted,color=group,group=group)) + geom_point() + geom_ribbon(aes(ymin = conf.low,ymax = conf.high)) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
+ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + geom_point() + geom_path() + geom_ribbon(aes(ymin = conf.low,ymax = conf.high),alpha = 0.5) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
