@@ -7,6 +7,7 @@ df <- read.csv("./data_cleaned/cleaned_dataframe.csv",stringsAsFactors = TRUE)
 library(lmerTest)
 library(tidyverse)
 library(car)
+library(ggeffects)
 
 # First check histograms of each variable to view distribution
 
@@ -68,3 +69,15 @@ Anova(m2)      #no difference in the order of variables. m1=m2
 ggplot(data=df,aes(x=distance_m,y=richness_non_native,colour = Traffic)) + geom_point() + geom_smooth(method="lm",se=FALSE) + theme_classic() + labs(x="Distance (m)",y="Non-native richness",colour="Traffic")
 
 m1 <- lm(richness_non_native)
+
+# Can use gg_effects package to fit lines to predicted values which is better for glm type models. Talk to mia about that package.
+
+predictions <- ggpredict(m1, terms = c("distance_m","Traffic"))
+
+# Lucas: Keep geom_errorbar in mind for my thesis
+
+# ggplot(predictions,aes(x=x,y=predicted,color=group,group=group)) + geom_point() + geom_errorbar(aes(ymin = conf.low,ymax = conf.high)) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
+
+# This is with ribbon. Need to make it prettier.
+
+ggplot(predictions,aes(x=x,y=predicted,color=group,group=group)) + geom_point() + geom_ribbon(aes(ymin = conf.low,ymax = conf.high)) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
