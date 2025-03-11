@@ -2,7 +2,18 @@
 
 # === Import packages and dataframes
 
-#Clean out NAs
+library(tidyverse)
+
+df <- read.csv("./data_raw/Data_Collection - Sheet1.csv",stringsAsFactors = TRUE)
+
+str(df)
+
+view(df)
+
+#Clean out NAs and notes
+
+df <- df %>% 
+  select(-notes)
 
 #Merge with other data if needed?
 
