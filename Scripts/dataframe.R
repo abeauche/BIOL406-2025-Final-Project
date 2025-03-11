@@ -8,8 +8,6 @@ df <- read.csv("./data_raw/Data_Collection - Sheet1.csv",stringsAsFactors = TRUE
 
 str(df)
 
-view(df)
-
 #Clean out NAs and notes
 
 df <- df %>% 
@@ -21,5 +19,5 @@ df <- df %>%
 
 #Export dataframe
 
-write_csv(df,"./data_cleaned/cleaned_dataframe")
+write_csv(df,"./data_cleaned/cleaned_dataframe.csv")
 
