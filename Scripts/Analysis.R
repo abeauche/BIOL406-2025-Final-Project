@@ -4,6 +4,9 @@
 
 df <- read.csv("./data_cleaned/cleaned_dataframe.csv",stringsAsFactors = TRUE)
 
+library(lmerTest)
+library(tidyverse)
+
 # First check histograms of each variable to view distribution
 
 hist(df$lesser_periwinkle_cover)
@@ -27,5 +30,20 @@ hist(df$richness_non_native)
 
 #Make models and analysis of scaled variables (DO NOT SCALE RESPONSE)
 
+m1 <- glm(richness_non_native ~ distance_m + Traffic, family = poisson, data = df)
+
+m2 <- glm(richness_non_native ~ Traffic + distance_m, family = poisson, data = df)
+
+summary(m1)
+anova(m1)
+
+summary(m2)
+anova(m2)      #no difference in the order of variables. m1=m2
+
 # Thinking a t test between trails as well as an ANCOVA of response over distance for each trail.
 
+# ===Some plots
+
+ggplot(data=df,aes(x=distance_m,y=richness_non_native,colour = Traffic)) + geom_point() + geom_smooth(method="lm",se=FALSE) + theme_classic() + labs(x="Distance (m)",y="Non-native richness",colour="Traffic")
+
+m1 <- lm(richness_non_native)
