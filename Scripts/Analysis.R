@@ -40,6 +40,16 @@ anova(m1)
 summary(m2)
 anova(m2)      #no difference in the order of variables. m1=m2
 
+# Call:
+# glm(formula = richness_non_native ~ distance_m + Traffic, family = poisson, 
+    # data = df)
+
+# Coefficients:
+  # Estimate Std. Error z value Pr(>|z|)    
+# (Intercept) -0.014285   0.462387  -0.031 0.975354    
+# distance_m  -0.004973   0.002481  -2.004 0.045034 *  
+  # TrafficLow   1.540445   0.449864   3.424 0.000617 ***
+
 # Thinking a t test between trails as well as an ANCOVA of response over distance for each trail.
 
 # ===Some plots
