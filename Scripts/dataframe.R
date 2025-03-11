@@ -18,3 +18,8 @@ df <- df %>%
 #Merge with other data if needed?
 
 #Mutate dataframes needed.
+
+#Export dataframe
+
+write_csv(df,"./data_cleaned/cleaned_dataframe")
+
