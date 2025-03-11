@@ -1,4 +1,4 @@
-QuadratID,Traffic,distance_m,angle_(º),lesser_periwinke_cover,rumex_cover,creeping_buttercup,spanish_bluebell,grass,english_ivy_cover,himalayan_blackberry_cover,english_laurel_cover,nipplewort_cover,english_holly_cover,cutleaf_blackberry_cover,other_cover,richness_non_native,dominant_tree_species,canopy_cover,bare_ground/litter,notes
+QuadratID,Traffic,distance_m,angle_(º),lesser_periwinkle_cover,rumex_cover,creeping_buttercup,spanish_bluebell,grass,english_ivy_cover,himalayan_blackberry_cover,english_laurel_cover,nipplewort_cover,english_holly_cover,cutleaf_blackberry_cover,other_cover,richness_non_native,dominant_tree_species,canopy_cover,bare_ground/litter,notes
 H1,High,0,236,0,0,0,0,1,0,0,0,0,0,5,1,3,cedar,10,0,"5% cutleaf blackberry, 1% unk"
 H2,High,25,272,0,0,0,0,0,0,30,0,0,0,0,0,1,cedar,55,0,
 H3,High,50,266,0,0,0,0,0,0,0,0,0,0,0,0,0,big leaf maple,80,35,
