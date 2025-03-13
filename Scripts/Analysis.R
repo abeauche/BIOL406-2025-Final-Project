@@ -81,3 +81,15 @@ predictions <- ggpredict(m1, terms = c("distance_m","Traffic"))
 # This is with ribbon. Need to make it prettier.
 
 ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + geom_point() + geom_path() + geom_ribbon(aes(ymin = conf.low,ymax = conf.high),alpha = 0.5) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
+
+# ===Wilcoxan Paired Rank Sign test
+
+high_traffic <- df %>%
+  filter(Traffic=="High")
+
+low_traffic <- df %>% 
+  filter(Traffic=="Low")
+
+result <- wilcox.test(high_traffic$richness_non_native,low_traffic$richness_non_native,paired = TRUE,alternative="less")
+
+print(result) #p=0.004158, low traffic is dignificantly higher in non native species richness than high traffic
