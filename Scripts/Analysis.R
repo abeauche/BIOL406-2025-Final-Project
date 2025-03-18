@@ -11,9 +11,9 @@ library(ggeffects)
 library(visreg)
 install.packages("DHARMa")
 library(DHARMa)
-install.packages("performance")
+# install.packages("performance")
 library(performance)
-install.packages("see")
+# install.packages("see")
 library(see)
 
 # First check histograms of each variable to view distribution
@@ -47,6 +47,7 @@ summary(m1)
 check_model(m1)
 simulationOutput <- simulateResiduals(fittedModel = m1, plot=F)
 plot(simulationOutput)
+visreg(m1, xvar = "x", ylim = range(y), rug = 2, scale = "response") 
 Anova(m1)
 
 summary(m2)
@@ -84,9 +85,17 @@ predictions <- ggpredict(m1, terms = c("distance_m","Traffic"))
 
 # ggplot(predictions,aes(x=x,y=predicted,color=group,group=group)) + geom_point() + geom_errorbar(aes(ymin = conf.low,ymax = conf.high)) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
 
+
+trail_colors <- c("High" == "brown4", "Low" == "darkolivegreen")
+
 # This is with ribbon. Need to make it prettier.
 
-ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + geom_point() + geom_path() + geom_ribbon(aes(ymin = conf.low,ymax = conf.high),alpha = 0.5) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
+ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + 
+  geom_ribbon(aes(ymin = conf.low,ymax = conf.high,fill=group,color=group),alpha = 0.5) + 
+  geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
+  theme_classic() + 
+  labs(x = "Distance (m)",y = "Predicted non-native richness",color="Traffic",fill="Traffic") +
+  scale_fill_manual(values = trail_colors) + scale_color_manual(values = trail_colors)
 
 ggsave("./figures/Predicted")
 
