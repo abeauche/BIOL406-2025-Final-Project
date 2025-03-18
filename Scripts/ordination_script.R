@@ -49,8 +49,11 @@ site_scores$Plot <- rownames(site_scores)
 # Assign trails based on plot names
 site_scores$Trail <- ifelse(grepl("^L", site_scores$Plot), "Low-Use", "High-Use")
 
-# Order plots along trails
-site_scores <- site_scores[order(site_scores$Trail, site_scores$Plot), ]
+# Extract numeric part for correct ordering
+site_scores$PlotNum <- as.numeric(sub("[LH]", "", site_scores$Plot))
+
+# Order correctly by trail and numeric plot order
+site_scores <- site_scores[order(site_scores$Trail, site_scores$PlotNum), ]
 
 # Define colors for trails
 trail_colors <- c("Low-Use" = "blue", "High-Use" = "red")
@@ -72,4 +75,3 @@ for (trail in unique(site_scores$Trail)) {
 
 # Add legend
 legend("topright", legend = names(trail_colors), col = trail_colors, pch = 19, bty = "n")
-
