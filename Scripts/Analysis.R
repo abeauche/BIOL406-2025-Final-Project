@@ -9,7 +9,7 @@ library(tidyverse)
 library(car)
 library(ggeffects)
 library(visreg)
-install.packages("DHARMa")
+# install.packages("DHARMa")
 library(DHARMa)
 # install.packages("performance")
 library(performance)
@@ -95,7 +95,7 @@ ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) +
   geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
   theme_classic() + 
   labs(x = "Distance (m)",y = "Predicted non-native richness",color="Traffic",fill="Traffic") +
-  scale_fill_manual(values = trail_colors) + scale_color_manual(values = trail_colors)
+  scale_fill_manual(values = c("High" = "brown4", "Low" = "darkolivegreen3")) + scale_color_manual(values = c("High" = "brown", "Low" = "darkolivegreen"))
 
 ggsave("./figures/Predicted")
 
