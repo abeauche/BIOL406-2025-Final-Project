@@ -8,6 +8,13 @@ library(lmerTest)
 library(tidyverse)
 library(car)
 library(ggeffects)
+library(visreg)
+install.packages("DHARMa")
+library(DHARMa)
+install.packages("performance")
+library(performance)
+install.packages("see")
+library(see)
 
 # First check histograms of each variable to view distribution
 
@@ -37,6 +44,9 @@ m1 <- glm(richness_non_native ~ distance_m + Traffic, family = poisson, data = d
 m2 <- glm(richness_non_native ~ Traffic + distance_m, family = poisson, data = df)
 
 summary(m1)
+check_model(m1)
+simulationOutput <- simulateResiduals(fittedModel = m1, plot=F)
+plot(simulationOutput)
 Anova(m1)
 
 summary(m2)
@@ -66,10 +76,6 @@ Anova(m2)      #no difference in the order of variables. m1=m2
 
 # ===Some plots
 
-ggplot(data=df,aes(x=distance_m,y=richness_non_native,colour = Traffic)) + geom_point() + geom_smooth(method="lm",se=FALSE) + theme_classic() + labs(x="Distance (m)",y="Non-native richness",colour="Traffic")
-
-m1 <- lm(richness_non_native)
-
 # Can use gg_effects package to fit lines to predicted values which is better for glm type models. Talk to mia about that package.
 
 predictions <- ggpredict(m1, terms = c("distance_m","Traffic"))
@@ -81,6 +87,8 @@ predictions <- ggpredict(m1, terms = c("distance_m","Traffic"))
 # This is with ribbon. Need to make it prettier.
 
 ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + geom_point() + geom_path() + geom_ribbon(aes(ymin = conf.low,ymax = conf.high),alpha = 0.5) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
+
+ggsave("./figures/Predicted")
 
 # ===Wilcoxan Paired Rank Sign test
 
