@@ -75,3 +75,4 @@ for (trail in unique(site_scores$Trail)) {
 
 # Add legend
 legend("topright", legend = names(trail_colors), col = trail_colors, pch = 19, bty = "n")
+
