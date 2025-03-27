@@ -91,6 +91,8 @@ trail_colors <- c("High" == "brown4", "Low" == "darkolivegreen")
 # This is with ribbon. Need to make it prettier.
 
 ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + 
+  geom_point() +
+  geom_line() +
   geom_ribbon(aes(ymin = conf.low,ymax = conf.high,fill=group,color=group),alpha = 0.5) + 
   geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
   theme_classic() + 
@@ -110,3 +112,4 @@ low_traffic <- df %>%
 result <- wilcox.test(high_traffic$richness_non_native,low_traffic$richness_non_native,paired = TRUE,alternative="less")
 
 print(result) #p=0.004158, low traffic is dignificantly higher in non native species richness than high traffic
+

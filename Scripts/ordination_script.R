@@ -76,3 +76,29 @@ for (trail in unique(site_scores$Trail)) {
 # Add legend
 legend("topright", legend = names(trail_colors), col = trail_colors, pch = 19, bty = "n")
 
+
+
+
+
+
+png("./Figures/nmds_plot.png", width = 800, height = 600)
+
+# NMDS Plot
+ordiplot(nmds_result, display = "sites", type = "n")
+
+# Plot points with colors
+points(site_scores[, 1:2], col = trail_colors[site_scores$Trail], pch = 19)
+
+# Add text labels
+text(site_scores[, 1:2], labels = site_scores$Plot, pos = 3, cex = 0.8)
+
+# Connect plots sequentially along each trail
+for (trail in unique(site_scores$Trail)) {
+  trail_points <- site_scores[site_scores$Trail == trail, ]
+  lines(trail_points[, 1:2], col = trail_colors[trail], lwd = 2)
+}
+
+# Add legend
+legend("topright", legend = names(trail_colors), col = trail_colors, pch = 19, bty = "n")
+
+dev.off()  # Close and save the file
