@@ -90,16 +90,31 @@ trail_colors <- c("High" == "brown4", "Low" == "darkolivegreen")
 
 # This is with ribbon. Need to make it prettier.
 
-ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + 
-  geom_point() +
-  geom_line() +
-  geom_ribbon(aes(ymin = conf.low,ymax = conf.high,fill=group,color=group),alpha = 0.5) + 
+figure2 <- ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + 
+  geom_line(aes(color=group)) +
+  geom_ribbon(aes(ymin = conf.low,ymax = conf.high,fill=group),alpha = 0.5) + 
   geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
   theme_classic() + 
   labs(x = "Distance (m)",y = "Predicted non-native richness",color="Traffic",fill="Traffic") +
-  scale_fill_manual(values = c("High" = "brown4", "Low" = "darkolivegreen3")) + scale_color_manual(values = c("High" = "brown", "Low" = "darkolivegreen"))
+  scale_fill_manual(values = c("High" = "purple4", "Low" = "aquamarine")) + scale_color_manual(values = c("High" = "purple4", "Low" = "aquamarine"))
 
-ggsave("./figures/Predicted")
+print(figure2)
+
+
+figure3 <- ggplot() + 
+  geom_point(aes(x=distance_m,y=richness_non_native,color=Traffic,group=Traffic,fill = Traffic), data = df) +
+  geom_line(aes(x=x, y=predicted, color=group), data = predictions) +
+  geom_ribbon(data = predictions, aes(x=x, y=predicted,ymin = conf.low,ymax = conf.high,fill=group),alpha = 0.4) +
+  #geom_smooth(method = "lm", aes(color=Traffic), se = TRUE) +
+  #geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
+  theme_classic() + 
+  labs(x = "Distance (m)",y = "Non-native richness",color="Traffic",fill="Traffic") +
+  scale_fill_manual(values = c("High" = "purple4", "Low" = "blue")) + scale_color_manual(values = c("High" = "purple4", "Low" = "blue"))
+  #ylim(0,8)
+
+print(figure3)
+
+ggsave("./figures/Predicted",figure2)
 
 # ===Wilcoxan Paired Rank Sign test
 
