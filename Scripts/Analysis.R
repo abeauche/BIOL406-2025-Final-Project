@@ -109,12 +109,13 @@ figure3 <- ggplot() +
   #geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
   theme_classic() + 
   labs(x = "Distance (m)",y = "Non-native richness",color="Traffic",fill="Traffic") +
-  scale_fill_manual(values = c("High" = "purple4", "Low" = "blue")) + scale_color_manual(values = c("High" = "purple4", "Low" = "blue"))
+  scale_fill_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) + scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
   #ylim(0,8)
 
 print(figure3)
 
-ggsave("./figures/Predicted",figure2)
+ggsave("./figures/Predicted.pdf",figure2)
+ggsave("./figures/distancerichness_brat.pdf",figure3)
 
 # ===Wilcoxan Paired Rank Sign test
 
