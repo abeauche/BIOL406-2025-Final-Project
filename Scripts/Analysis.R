@@ -114,8 +114,8 @@ figure3 <- ggplot() +
 
 print(figure3)
 
-ggsave("./figures/Predicted.pdf",figure2)
-ggsave("./figures/distancerichness_brat.pdf",figure3)
+ggsave("./figures/Predicted.PNG",figure2)
+ggsave("./figures/distancerichness_brat.PNG",figure3)
 
 # ===Wilcoxan Paired Rank Sign test
 
