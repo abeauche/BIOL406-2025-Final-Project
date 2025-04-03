@@ -117,6 +117,41 @@ print(figure3)
 ggsave("./figures/Predicted.PNG",figure2)
 ggsave("./figures/distancerichness_brat.PNG",figure3)
 
+
+
+### Summarize non-native percent cover per plot
+df_pct_cover <- df %>%
+  rename(grass_cover = grass)
+
+# Identify columns that contain species cover values but exclude "canopy_cover"
+species_cols <- setdiff(grep("_cover$", names(df_pct_cover), value = TRUE), "canopy_cover")
+
+# Sum percent cover across all species columns
+df_pct_cover$total_percent_cover_non_native <- rowSums(df_pct_cover[, species_cols], na.rm = TRUE)
+
+
+m3 <- glm(total_percent_cover_non_native ~ distance_m + Traffic, family = poisson, data = df_pct_cover)
+summary(m3)
+
+predictions_3 <- ggpredict(m3, terms = c("distance_m","Traffic"))
+
+figure4 <- ggplot() + 
+  geom_point(aes(x=distance_m,y=total_percent_cover_non_native,color=Traffic,group=Traffic,fill = Traffic), data = df_pct_cover) +
+  geom_line(aes(x=x, y=predicted, color=group), data = predictions_3) +
+  geom_ribbon(data = predictions_3, aes(x=x, y=predicted,ymin = conf.low,ymax = conf.high,fill=group),alpha = 0.4) +
+  #geom_smooth(method = "lm", aes(color=Traffic), se = TRUE) +
+  #geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
+  theme_classic() + 
+  labs(x = "Distance (m)",y = "Non-native percent cover",color="Traffic",fill="Traffic") +
+  scale_fill_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) + scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
+#ylim(0,8)
+
+print(figure4)
+
+ggsave("./figures/distancepctcover_brat.PNG",figure4)
+
+
+
 # ===Wilcoxan Paired Rank Sign test
 
 high_traffic <- df %>%
