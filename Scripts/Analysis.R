@@ -238,6 +238,30 @@ ggplot(df_summary3, aes(x = distance_m, y = proportion_animal, color = Traffic, 
   scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "darkgrey")   # Adds y = 0 line
 
+
+m4 <- glm(proportion_animal ~ distance_m + Traffic, data = df_summary3)
+summary(m4)
+
+predictions_4 <- ggpredict(m4, terms = c("distance_m","Traffic"))
+
+# Ensure `Traffic` is recognized correctly
+predictions_4$Traffic <- predictions_4$group  # Rename `group` to `Traffic` if needed
+
+# Plot
+figure5 <- ggplot() + 
+  geom_point(aes(x = distance_m, y = proportion_animal, color = Traffic, group = Traffic, fill = Traffic), data = df_summary3) +
+  geom_line(aes(x = x, y = predicted, color = Traffic, group = Traffic), data = predictions_4) + 
+  geom_ribbon(aes(x = x, y = predicted, ymin = conf.low, ymax = conf.high, fill = Traffic), data = predictions_4, alpha = 0.4) +
+  theme_classic() + 
+  labs(x = "Distance (m)", y = "Proportion of Animal-Dispersed Non-native Species", color = "Traffic", fill = "Traffic") +
+  scale_fill_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) + 
+  scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
+
+
+print(figure5)
+
+ggsave("./figures/distancepctcover_brat.PNG",figure4)
+
 # ===Wilcoxan Paired Rank Sign test
 
 high_traffic <- df %>%
