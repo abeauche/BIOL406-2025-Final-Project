@@ -3,6 +3,7 @@
 #Import
 
 df <- read.csv("./data_cleaned/cleaned_dataframe.csv",stringsAsFactors = TRUE)
+species_dispersal <- read.csv("./data_raw/species_dispersal.csv",stringsAsFactors = TRUE)
 
 library(lmerTest)
 library(tidyverse)
@@ -121,7 +122,7 @@ ggsave("./figures/distancerichness_brat.PNG",figure3)
 
 ### Summarize non-native percent cover per plot
 df_pct_cover <- df %>%
-  rename(grass_cover = grass)
+  rename(canopy_pct = canopy_cover)
 
 # Identify columns that contain species cover values but exclude "canopy_cover"
 species_cols <- setdiff(grep("_cover$", names(df_pct_cover), value = TRUE), "canopy_cover")
@@ -151,6 +152,91 @@ print(figure4)
 ggsave("./figures/distancepctcover_brat.PNG",figure4)
 
 
+
+# Pivot_longer_df
+df_long <- df %>%
+  pivot_longer(
+    cols = ends_with("_cover"),  # Selects all species cover columns
+    names_to = "species",        # New column for species names
+    values_to = "percent_cover"  # New column for percent cover values
+  )
+
+df_long <- df_long %>%
+  filter(!species == "canopy_cover")
+
+# Left join species_dispersal files
+
+df_long <- df_long %>%
+  left_join(species_dispersal, by = "species")
+
+
+# Summarize dispersal method 
+
+df_summary <- df_long %>%
+  filter(percent_cover > 0) %>%  # Join dispersal syndromes
+  group_by(QuadratID) %>%  # Group by QuadratID
+  summarise(
+    wind_dispersed = sum(wind, na.rm = TRUE),
+    animal_dispersed = sum(animal, na.rm = TRUE),
+    water_dispersed = sum(water, na.rm = TRUE),
+    unspecified_dispersed = sum(unspecified, na.rm = TRUE)
+  )
+
+
+df_summary <- df_summary %>%
+  left_join(df %>% select(QuadratID, distance_m, Traffic), by = "QuadratID")
+
+
+df_long_summary <- df_summary %>%
+  pivot_longer(
+    cols = c(wind_dispersed, animal_dispersed, water_dispersed, unspecified_dispersed),
+    names_to = "dispersal_type",
+    values_to = "count"
+  )
+
+df_summary2 <- df %>%
+  select(QuadratID, distance_m, Traffic) %>%
+  left_join(df_long_summary, by = "QuadratID")
+
+ggplot(df_long_summary, aes(x = distance_m, y = count, color = Traffic, group = Traffic)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE) +  # Smoothed trend
+  facet_wrap(~dispersal_type, scales = "free_y") +  # Separate plots for dispersal types
+  theme_classic() +
+  labs(x = "Distance (m)", y = "Count of species", color = "Traffic") +
+  scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
+
+
+df_summary <- df_summary %>%
+  mutate(proportion_animal = animal_dispersed / (wind_dispersed + animal_dispersed + water_dispersed + unspecified_dispersed))
+
+ggplot(df_summary, aes(x = distance_m, y = proportion_animal, color = Traffic, group = Traffic)) +
+  geom_point() +  # Scatter plot of points
+  geom_smooth(method = "lm", se = FALSE) +  # Smoothed trend line
+  theme_classic() +
+  labs(x = "Distance (m)", y = "Proportion of Animal-Dispersed Species", color = "Traffic") +
+  scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
+
+df_summary_filtered <- df_summary %>%
+  select(QuadratID, proportion_animal)
+
+df_summary3 <- df %>%
+  select(QuadratID, distance_m, Traffic) %>%
+  left_join(df_summary_filtered, by = "QuadratID")
+
+
+df_summary3 <- df_summary3 %>%
+  mutate(
+    proportion_animal = replace_na(proportion_animal, 0)  # Replace NA with 0
+  )
+
+ggplot(df_summary3, aes(x = distance_m, y = proportion_animal, color = Traffic, group = Traffic)) +
+  geom_point() +  # Scatter plot of points
+  geom_smooth(method = "lm", se = TRUE) +  # Smoothed trend line
+  theme_classic() +
+  labs(x = "Distance (m)", y = "Proportion of Animal-Dispersed Species", color = "Traffic") +
+  scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "darkgrey")   # Adds y = 0 line
 
 # ===Wilcoxan Paired Rank Sign test
 
