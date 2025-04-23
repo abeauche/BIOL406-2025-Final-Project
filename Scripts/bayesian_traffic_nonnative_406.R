@@ -105,9 +105,8 @@ zib_model <- brm(
 summary(zib_model)
 
 
-library(ggeffects)
 
-# For the main (mu) part — percent cover when not zero
+# Plot richness distance relationship
 pred_mu <- ggpredict(non_native_rich_poisson_m1, terms = c("distance_m", "Traffic"))
 plot(pred_mu) + ggtitle("Predicted Percent Cover (non-zero part)") + theme_classic() 
 
@@ -115,7 +114,7 @@ plot(pred_mu) + ggtitle("Predicted Percent Cover (non-zero part)") + theme_class
 pred_mu_df <- as.data.frame(pred_mu)
 
 # Plot with ggplot
-ggplot(pred_mu_df, aes(x = x, y = predicted, color = group)) +
+brms_distance_richness <- ggplot(pred_mu_df, aes(x = x, y = predicted, color = group)) +
   geom_line(size = 1.2) +
   geom_point(data = df_pct_cover, aes(x = distance_m, y = richness_non_native, colour = Traffic)) +
   geom_ribbon(data = pred_mu_df, aes(ymin = conf.low, ymax = conf.high, fill = group), alpha = 0.2) +  # Ribbon for CI
@@ -125,7 +124,7 @@ ggplot(pred_mu_df, aes(x = x, y = predicted, color = group)) +
   labs(color="Traffic",fill="Traffic") +
   scale_fill_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) + scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
 
-
+ggsave("./figures/brms_richness_distance.png",brms_distance_richness)
 
 
 
