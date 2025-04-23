@@ -217,7 +217,7 @@ df_summary3 <- df_summary3 %>%
   )
 
 # Plot data
-ggplot(df_summary3, aes(x = distance_m, y = proportion_animal, color = Traffic, group = Traffic)) +
+distance_animal_prop <- ggplot(df_summary3, aes(x = distance_m, y = proportion_animal, color = Traffic, group = Traffic)) +
   geom_point() +  # Scatter plot of points
   geom_smooth(method = "lm", se = TRUE) +  # Smoothed trend line
   theme_classic() +
@@ -225,6 +225,7 @@ ggplot(df_summary3, aes(x = distance_m, y = proportion_animal, color = Traffic, 
   scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "darkgrey")   # Adds y = 0 line +
   
+ggsave("./figures/distanceanimalprop_brat.PNG",distance_animal_prop)
 
 # Visualize distribution of data
 hist(df_summary3$proportion_animal)
@@ -254,7 +255,6 @@ figure5 <- ggplot() +
   scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
 print(figure5)
 
-ggsave("./figures/distancepctcover_brat.PNG",figure4)
 
 
 
