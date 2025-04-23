@@ -1,3 +1,14 @@
+# ====================================================
+# Script Name: Analysis.R
+# Project: BIOL406-2025-Final_Project_github
+# Author: Lucas Braun, Alex Beauchemin
+# Date Created: 2025-03-11
+# Last Modified: 2025-04-22
+# Description: This script runs generalized linear models (GLMs) to test predictions and relationships from our BIOL406 data.
+# Dependencies: R packages: brms, lmerTest, tidyverse, car, ggeffects, visreg, DHARMa, performance, see.
+# ====================================================
+
+
 # ===Analysis
 
 #Import
