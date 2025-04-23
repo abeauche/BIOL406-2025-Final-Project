@@ -1,6 +1,12 @@
-### BIOL406 - FINAL PROJECT ###
-### Alex Beauchemin, Lucas Braun, and Denis Kasianiuk ###
-### March 18, 2025 ###
+# ====================================================
+# Script Name: bayesian_traffic_nonnative_406.R
+# Project: BIOL406-2025-Final_Project_github
+# Author: Alex Beauchemin
+# Date Created: 2025-03-18
+# Last Modified: 2025-04-22
+# Description: This script runs an NMDS ordination for non-native species assemblage at sites along 250m-long transects along a high-use and a low-use trail in Pacific Spirit Park, BC.
+# Dependencies: cleaned_dataframe.csv, R packages: tidyr, dplyr, vegan, ggplot2, lubridate.
+# ====================================================
 
 
 library(tidyr)
@@ -28,6 +34,7 @@ rownames(non_native_data_matrix) <- non_native_data_pct$QuadratID  # Set plot na
 # Run NMDS ordination
 set.seed(123)  # For reproducibility
 nmds_result <- metaMDS(non_native_data_matrix, distance = "bray", k = 2, trymax = 100)
+nmds_result$stress
 
 # Basic NMDS plot
 plot(nmds_result, type = "t")  # 't' = text labels
@@ -75,11 +82,6 @@ for (trail in unique(site_scores$Trail)) {
 
 # Add legend
 legend("topright", legend = names(trail_colors), col = trail_colors, pch = 19, bty = "n")
-
-
-
-
-
 
 png("./Figures/nmds_plot.png", width = 800, height = 600)
 
