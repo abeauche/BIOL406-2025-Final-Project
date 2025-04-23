@@ -56,7 +56,7 @@ site_scores$PlotNum <- as.numeric(sub("[LH]", "", site_scores$Plot))
 site_scores <- site_scores[order(site_scores$Trail, site_scores$PlotNum), ]
 
 # Define colors for trails
-trail_colors <- c("Low-Use" = "blue", "High-Use" = "red")
+trail_colors <- c("Low-Use" = "#4B0092", "High-Use" = "#B4DD1E")
 
 # Basic NMDS plot setup
 ordiplot(nmds_result, display = "sites", type = "n")

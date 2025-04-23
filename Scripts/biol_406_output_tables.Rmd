@@ -1,0 +1,49 @@
+---
+title: "Zero-Inflated Beta Model Summary"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(brms)
+library(broom)
+library(knitr)
+library(kableExtra)
+``` 
+
+```{r, echo=FALSE}
+# Create a data frame with the regression coefficients and relevant statistics
+poisson_summary <- data.frame(
+  Parameter = c("Intercept", "distance_m", "TrafficLow"),
+  Estimate = c(0.10, -0.01, 1.36),
+  Est.Error = c(0.41, 0.00, 0.38),
+  `l-95% CI` = c(-0.71, -0.01, 0.62),
+  `u-95% CI` = c(0.86, -0.00, 2.11),
+  Rhat = c(1.00, 1.00, 1.00),
+  Bulk_ESS = c(2185, 3443, 1684),
+  Tail_ESS = c(2724, 2714, 2086)
+)
+
+# Load knitr for table rendering
+library(knitr)
+
+# Display the summary table
+kable(poisson_summary, caption = "Poisson Regression Coefficients Summary", 
+      format = "pipe", digits = 2)
+
+
+# Create a data frame with the model summary output, including further distributional parameters
+zib_summary <- data.frame(
+  Parameter = c("Intercept", "zi_Intercept", "distance_m", "TrafficLow", "zi_distance_m", "zi_TrafficLow", "phi"),
+  Estimate = c(-1.06, -1.99, -0.00, -0.23, 0.04, -9.98, 2.69),
+  Est.Error = c(0.72, 1.72, 0.01, 0.83, 0.02, 4.09, 1.09),
+  `l-95% CI` = c(-2.49, -5.94, -0.01, -1.79, 0.01, -19.49, 1.07),
+  `u-95% CI` = c(0.34, 1.01, 0.01, 1.44, 0.10, -3.81, 5.31),
+  Rhat = c(1.00, 1.00, 1.00, 1.00, 1.00, 1.01, 1.00),
+  Bulk_ESS = c(4032, 2508, 2958, 2459, 1669, 1034, 2839),
+  Tail_ESS = c(2949, 1741, 3033, 2825, 1185, 1492, 2571)
+)
+
+
+# Display the table in Markdown format using knitr::kable()
+knitr::kable(zib_summary, format = "markdown", col.names = c("Parameter", "Estimate", "Est.Error", "l-95% CI", "u-95% CI", "Rhat", "Bulk_ESS", "Tail_ESS"))
