@@ -97,22 +97,9 @@ predictions <- ggpredict(m1, terms = c("distance_m","Traffic"))
 
 # ggplot(predictions,aes(x=x,y=predicted,color=group,group=group)) + geom_point() + geom_errorbar(aes(ymin = conf.low,ymax = conf.high)) + geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + theme_classic() + labs(x = "Distance (m)",y = "Predicted non_native richness",color="Traffic")
 
-
-trail_colors <- c("High" == "brown4", "Low" == "darkolivegreen")
-
 # This is with ribbon. Need to make it prettier.
 
-figure2 <- ggplot(predictions,aes(x=x,y=predicted,color=group,group=group,fill = group)) + 
-  geom_line(aes(color=group)) +
-  geom_ribbon(aes(ymin = conf.low,ymax = conf.high,fill=group),alpha = 0.5) + 
-  geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
-  theme_classic() + 
-  labs(x = "Distance (m)",y = "Predicted non-native richness",color="Traffic",fill="Traffic") +
-  scale_fill_manual(values = c("High" = "purple4", "Low" = "aquamarine")) + scale_color_manual(values = c("High" = "purple4", "Low" = "aquamarine"))
-
-print(figure2)
-
-
+# Plot predictions of richness according to distance, and save
 figure3 <- ggplot() + 
   geom_point(aes(x=distance_m,y=richness_non_native,color=Traffic,group=Traffic,fill = Traffic), data = df) +
   geom_line(aes(x=x, y=predicted, color=group), data = predictions) +
@@ -141,10 +128,9 @@ species_cols <- setdiff(grep("_cover$", names(df_pct_cover), value = TRUE), "can
 # Sum percent cover across all species columns
 df_pct_cover$total_percent_cover_non_native <- rowSums(df_pct_cover[, species_cols], na.rm = TRUE)
 
-
+# Model in GLM for easy visualization
 m3 <- glm(total_percent_cover_non_native ~ distance_m + Traffic, family = poisson, data = df_pct_cover)
 summary(m3)
-
 predictions_3 <- ggpredict(m3, terms = c("distance_m","Traffic"))
 
 figure4 <- ggplot() + 
@@ -154,7 +140,7 @@ figure4 <- ggplot() +
   #geom_smooth(method = "lm", aes(color=Traffic), se = TRUE) +
   #geom_hline(yintercept = 1.0,linetype = "dashed", color = "dimgrey") + 
   theme_classic() + 
-  labs(x = "Distance (m)",y = "Non-native percent cover",color="Traffic",fill="Traffic") +
+  labs(x = "Distance (m)",y = "Non-native Percent Cover (%)",color="Traffic",fill="Traffic") +
   scale_fill_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) + scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
 #ylim(0,8)
 
@@ -171,18 +157,14 @@ df_long <- df %>%
     names_to = "species",        # New column for species names
     values_to = "percent_cover"  # New column for percent cover values
   )
-
 df_long <- df_long %>%
   filter(!species == "canopy_cover")
 
 # Left join species_dispersal files
-
 df_long <- df_long %>%
   left_join(species_dispersal, by = "species")
 
-
 # Summarize dispersal method 
-
 df_summary <- df_long %>%
   filter(percent_cover > 0) %>%  # Join dispersal syndromes
   group_by(QuadratID) %>%  # Group by QuadratID
@@ -193,11 +175,11 @@ df_summary <- df_long %>%
     unspecified_dispersed = sum(unspecified, na.rm = TRUE)
   )
 
-
+# Left join with relevant columns
 df_summary <- df_summary %>%
-  left_join(df %>% select(QuadratID, distance_m, Traffic), by = "QuadratID")
+  left_join(df %>% select(QuadratID, distance_m, Traffic, richness_non_native), by = "QuadratID")
 
-
+# Pivot long for tidy format
 df_long_summary <- df_summary %>%
   pivot_longer(
     cols = c(wind_dispersed, animal_dispersed, water_dispersed, unspecified_dispersed),
@@ -205,10 +187,7 @@ df_long_summary <- df_summary %>%
     values_to = "count"
   )
 
-df_summary2 <- df %>%
-  select(QuadratID, distance_m, Traffic) %>%
-  left_join(df_long_summary, by = "QuadratID")
-
+# Exploratory: plot by dispersal syndrome across distance
 ggplot(df_long_summary, aes(x = distance_m, y = count, color = Traffic, group = Traffic)) +
   geom_point() +
   geom_smooth(method = "lm", se = TRUE) +  # Smoothed trend
@@ -217,43 +196,49 @@ ggplot(df_long_summary, aes(x = distance_m, y = count, color = Traffic, group = 
   labs(x = "Distance (m)", y = "Count of species", color = "Traffic") +
   scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
 
-
+# Mutate proportion animal from animal dispersed/richness_non_native
 df_summary <- df_summary %>%
-  mutate(proportion_animal = animal_dispersed / (wind_dispersed + animal_dispersed + water_dispersed + unspecified_dispersed))
+  mutate(proportion_animal = animal_dispersed / richness_non_native)
 
-ggplot(df_summary, aes(x = distance_m, y = proportion_animal, color = Traffic, group = Traffic)) +
-  geom_point() +  # Scatter plot of points
-  geom_smooth(method = "lm", se = FALSE) +  # Smoothed trend line
-  theme_classic() +
-  labs(x = "Distance (m)", y = "Proportion of Animal-Dispersed Species", color = "Traffic") +
-  scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
-
+# Filter to avoid redundant columns
 df_summary_filtered <- df_summary %>%
-  select(QuadratID, proportion_animal)
+  select(QuadratID, proportion_animal, animal_dispersed)
 
+# Join with all rows from df
 df_summary3 <- df %>%
-  select(QuadratID, distance_m, Traffic) %>%
+  select(QuadratID, distance_m, Traffic, richness_non_native) %>%
   left_join(df_summary_filtered, by = "QuadratID")
 
-
+# Replace NAs with 0s
 df_summary3 <- df_summary3 %>%
   mutate(
-    proportion_animal = replace_na(proportion_animal, 0)  # Replace NA with 0
+    proportion_animal = replace_na(proportion_animal, 0),  # Replace NA with 0
+    animal_dispersed = replace_na(animal_dispersed, 0)
   )
 
+# Plot data
 ggplot(df_summary3, aes(x = distance_m, y = proportion_animal, color = Traffic, group = Traffic)) +
   geom_point() +  # Scatter plot of points
   geom_smooth(method = "lm", se = TRUE) +  # Smoothed trend line
   theme_classic() +
   labs(x = "Distance (m)", y = "Proportion of Animal-Dispersed Species", color = "Traffic") +
   scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "darkgrey")   # Adds y = 0 line
+  geom_hline(yintercept = 0, linetype = "dashed", color = "darkgrey")   # Adds y = 0 line +
+  
 
+# Visualize distribution of data
+hist(df_summary3$proportion_animal)
+hist(df_summary3$animal_dispersed)
 
-m4 <- glm(proportion_animal ~ distance_m + Traffic, data = df_summary3)
-summary(m4)
+# Fit binomial glm for number of animal dispersed according to total number of non-natives
+m_binom <- glm(cbind(animal_dispersed, richness_non_native - animal_dispersed) ~ distance_m + Traffic,
+               family = binomial, data = df_summary3)
+summary(m_binom)
 
-predictions_4 <- ggpredict(m4, terms = c("distance_m","Traffic"))
+# Check for overdispersion
+summary(m_binom)$dispersion
+
+predictions_4 <- ggpredict(m_binom, terms = c("distance_m","Traffic"))
 
 # Ensure `Traffic` is recognized correctly
 predictions_4$Traffic <- predictions_4$group  # Rename `group` to `Traffic` if needed
@@ -267,11 +252,11 @@ figure5 <- ggplot() +
   labs(x = "Distance (m)", y = "Proportion of Animal-Dispersed Non-native Species", color = "Traffic", fill = "Traffic") +
   scale_fill_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092")) + 
   scale_color_manual(values = c("High" = "#B4DD1E", "Low" = "#4B0092"))
-
-
 print(figure5)
 
 ggsave("./figures/distancepctcover_brat.PNG",figure4)
+
+
 
 # ===Wilcoxan Paired Rank Sign test
 
